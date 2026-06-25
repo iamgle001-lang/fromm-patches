@@ -1,18 +1,28 @@
 package app.morphe.patches.fromm.chat.unread
 
 import app.morphe.patcher.fingerprint
+import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patches.fromm.util.InstructionHelper
+import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.builder.instruction.BuilderInstruction21s
+import com.android.tools.smali.dexlib2.builder.instruction.BuilderInstruction31i
+import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
 
-// Finds the helper that formats an integer count as a display string,
-// capping at "99+" when the count exceeds 99.
-// Constraint: returns String, takes exactly one integral parameter (I or J).
+// Matches the method that formats an integer count into a display string,
+// capping it at 99 (shows "99+" for anything above).
+// Strategy: skip string matching (may be a resource) and instead detect
+// the CONST_16/CONST instruction that loads the literal 99 threshold.
 private val unreadCountCapFingerprint = fingerprint {
     returns("Ljava/lang/String;")
-    strings("99+")
     custom { method, _ ->
-        method.parameterTypes.size == 1 &&
-            (method.parameterTypes[0] == "I" || method.parameterTypes[0] == "J")
+        // Must accept at least one int or long parameter.
+        if (!method.parameterTypes.any { it == "I" || it == "J" }) return@custom false
+        // Must contain a const instruction loading the value 99.
+        method.implementation?.instructions?.any { instr ->
+            (instr.opcode == Opcode.CONST_16 || instr.opcode == Opcode.CONST) &&
+                (instr as? NarrowLiteralInstruction)?.narrowLiteral == 99
+        } == true
     }
 }
 
@@ -25,30 +35,24 @@ val showActualMessageCountPatch = bytecodePatch(
 
     execute {
         val method = unreadCountCapFingerprint.match().method
+        val instrs = InstructionHelper.getInstructions(method)
 
-        // ACC_STATIC = 0x0008.  For static methods the first explicit parameter
-        // is p0; for instance methods p0 is `this` and the count is p1.
-        val isStatic = (method.accessFlags and 0x0008) != 0
-        val paramType = method.parameterTypes[0]
+        // Locate the const instruction that loads 99 (the display cap threshold).
+        val capIdx = instrs.indexOfFirst { instr ->
+            (instr.opcode == Opcode.CONST_16 || instr.opcode == Opcode.CONST) &&
+                (instr as? NarrowLiteralInstruction)?.narrowLiteral == 99
+        }
+        if (capIdx == -1) throw PatchException("99 threshold constant not found in method")
 
-        val smali = if (paramType == "J") {
-            // Long parameter occupies two registers (wide pair).
-            val regs = if (isStatic) "p0, p1" else "p1, p2"
-            """
-            invoke-static {$regs}, Ljava/lang/String;->valueOf(J)Ljava/lang/String;
-            move-result-object v0
-            return-object v0
-            """.trimIndent()
-        } else {
-            // Int parameter — most common case.
-            val reg = if (isStatic) "p0" else "p1"
-            """
-            invoke-static {$reg}, Ljava/lang/String;->valueOf(I)Ljava/lang/String;
-            move-result-object v0
-            return-object v0
-            """.trimIndent()
+        // Determine which register holds the constant.
+        val reg = when (instrs[capIdx].opcode) {
+            Opcode.CONST_16 -> (instrs[capIdx] as? BuilderInstruction21s)?.registerA ?: 0
+            else            -> (instrs[capIdx] as? BuilderInstruction31i)?.registerA ?: 0
         }
 
-        InstructionHelper.replaceInstructions(method, 0, smali)
+        // Replace the 99 cap with Integer.MAX_VALUE.
+        // "count > 99"           → "count > 2_147_483_647"  (never true in practice)
+        // The method therefore always falls through to the normal number→string path.
+        InstructionHelper.replaceInstruction(method, capIdx, "const v$reg, 0x7fffffff")
     }
 }
