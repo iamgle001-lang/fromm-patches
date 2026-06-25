@@ -15,10 +15,10 @@ patches {
     about {
         name = "fromm Patches"
         description = "Patches for the fromm fan app"
-        author = "morphe"
+        author = "iamgle001-lang"
         contact = "iamgle001@gmail.com"
-        website = "https://github.com/morphe/fromm-patches"
-        source = "https://github.com/morphe/fromm-patches"
+        website = "https://github.com/iamgle001-lang/fromm-patches"
+        source = "https://github.com/iamgle001-lang/fromm-patches"
         license = "GNU General Public License v3.0"
     }
 }
