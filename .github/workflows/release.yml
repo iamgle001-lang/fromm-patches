@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -44,7 +44,6 @@ jobs:
           name: v${{ steps.version.outputs.version }}
           files: |
             patches/build/libs/patches-${{ steps.version.outputs.version }}.mpp
-            patches/build/libs/patches-${{ steps.version.outputs.version }}.mpp.asc
 
       - name: Update patches-bundle.json
         run: |
@@ -56,7 +55,7 @@ jobs:
             "created_at": "$(date -u +%Y-%m-%dT%H:%M:%S)",
             "description": "SSL Pinning Bypass patch for fromm (com.knowmerce.fromm.fan)",
             "download_url": "https://github.com/${REPO}/releases/download/v${VERSION}/patches-${VERSION}.mpp",
-            "signature_download_url": "https://github.com/${REPO}/releases/download/v${VERSION}/patches-${VERSION}.mpp.asc"
+            "signature_download_url": ""
           }
           EOF
 
