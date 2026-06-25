@@ -106,7 +106,7 @@ val showDeletedMessagesPatch = bytecodePatch(
         // full SQL strings built in one const-string instruction.
         fun removeDeletedAtFilter(method: app.morphe.patcher.util.proxy.mutableTypes.MutableMethod) {
             val instrs = InstructionHelper.getInstructions(method)
-            data class Mod(val idx: Int, val reg: Int, val newStr: String)
+            data class Mod(val idx: Int, val reg: Int, val smali: String)
             val mods = mutableListOf<Mod>()
             instrs.forEachIndexed { idx, instr: BuilderInstruction ->
                 if (instr.opcode != Opcode.CONST_STRING) return@forEachIndexed
@@ -114,10 +114,18 @@ val showDeletedMessagesPatch = bytecodePatch(
                 if (!ref.contains("deletedAt IS NULL OR deletedAt = 0")) return@forEachIndexed
                 val newStr = ref.replace(" AND (deletedAt IS NULL OR deletedAt = 0)", "")
                 val reg = (instr as? BuilderInstruction21c)?.registerA ?: 0
-                mods.add(Mod(idx, reg, newStr))
+                // Escape special characters so the smali compiler doesn't choke on
+                // actual newlines / backslashes that Room embeds in multi-line @Query strings.
+                val escaped = newStr
+                    .replace("\\", "\\\\")
+                    .replace("\"", "\\\"")
+                    .replace("\n", "\\n")
+                    .replace("\r", "\\r")
+                    .replace("\t", "\\t")
+                mods.add(Mod(idx, reg, "const-string v$reg, \"$escaped\""))
             }
-            mods.forEach { (idx, reg, newStr) ->
-                InstructionHelper.replaceInstruction(method, idx, "const-string v$reg, \"$newStr\"")
+            mods.forEach { (idx, _, smali) ->
+                InstructionHelper.replaceInstruction(method, idx, smali)
             }
         }
 
