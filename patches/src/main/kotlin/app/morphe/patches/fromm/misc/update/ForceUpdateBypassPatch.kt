@@ -30,24 +30,24 @@ val forceUpdateBypassPatch = bytecodePatch(
         val method = checkAvailabilityFingerprint.match().method
         val instructions = InstructionHelper.getInstructions(method)
 
-        val forceUpdateInstr = instructions.firstOrNull { instr: BuilderInstruction ->
-            instr.opcode == Opcode.SGET_OBJECT &&
-                (instr as? ReferenceInstruction)?.reference?.toString()?.contains("usecases/common/f;->a:") == true
-        } as? BuilderInstruction21c
-            ?: throw PatchException("ForceUpdateRequired sget not found")
-
+        // Find the Success singleton field reference so we can return it directly.
         val successInstr = instructions.lastOrNull { instr: BuilderInstruction ->
             instr.opcode == Opcode.SGET_OBJECT &&
                 (instr as? ReferenceInstruction)?.reference?.toString()?.contains("usecases/common/g;->a:") == true
         } as? BuilderInstruction21c
             ?: throw PatchException("Success sget not found")
 
-        val forceReturnIdx = instructions.indexOf(forceUpdateInstr)
-        val destReg = forceUpdateInstr.registerA
         val successRef = successInstr.reference.toString()
 
-        // Replace the ForceUpdateRequired SGET with the Success SGET using the same register.
-        // No goto needed — the downstream code will continue with the Success value.
-        InstructionHelper.replaceInstruction(method, forceReturnIdx, "sget-object v$destReg, $successRef")
+        // Insert at position 0: load Success and return immediately.
+        // This skips all force-update logic regardless of method structure.
+        InstructionHelper.addInstructions(
+            method,
+            0,
+            """
+            sget-object v0, $successRef
+            return-object v0
+            """.trimIndent(),
+        )
     }
 }
