@@ -77,15 +77,7 @@ jobs:
             "${VERSION}" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "${REPO}" > patches-bundle.json
 
           # Update version field in patches-list.json
-          python3 -c "
-import json
-with open('patches-list.json', 'r') as f:
-    data = json.load(f)
-data['version'] = '${VERSION}'
-with open('patches-list.json', 'w') as f:
-    json.dump(data, f, indent=2, ensure_ascii=False)
-print('Updated patches-list.json version to ${VERSION}')
-"
+          jq --arg v "${VERSION}" '.version = $v' patches-list.json > patches-list.json.tmp && mv patches-list.json.tmp patches-list.json
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
