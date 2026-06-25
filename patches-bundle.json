@@ -1,6 +1,6 @@
 {
-  "version": "1.1.6",
-  "created_at": "2026-06-25T16:19:00Z",
+  "version": "1.1.7",
+  "created_at": "2026-06-25T16:27:16Z",
   "description": "Patches for fromm fan app (com.knowmerce.fromm.fan)",
   "download_url": "https://raw.githubusercontent.com/iamgle001-lang/fromm-patches/main/patches-latest.mpp"
 }
