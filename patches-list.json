@@ -1,0 +1,101 @@
+{
+  "version": "1.0.6",
+  "patches": [
+    {
+      "name": "Show deleted messages",
+      "description": "Preserves content of deleted messages and shows them in the chat list.",
+      "default": false,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.knowmerce.fromm.fan"
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Disable analytics",
+      "description": "Disables Mixpanel event tracking and Firebase Analytics collection.",
+      "default": false,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.knowmerce.fromm.fan"
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Disable Crashlytics",
+      "description": "Prevents crash reports from being sent to Firebase Crashlytics.",
+      "default": false,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.knowmerce.fromm.fan"
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Disable Flarelane push",
+      "description": "Disables Flarelane push marketing SDK initialization.",
+      "default": false,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.knowmerce.fromm.fan"
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Bypass purchase terms agreement",
+      "description": "Skips the purchase terms agreement screen by always reporting it as agreed.",
+      "default": false,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.knowmerce.fromm.fan"
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Disable app reload prompt",
+      "description": "Always returns false for shouldReloadApp, preventing forced app restarts.",
+      "default": false,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.knowmerce.fromm.fan"
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "SSL pinning bypass",
+      "description": "Adds a network security config to bypass SSL certificate pinning.",
+      "default": false,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.knowmerce.fromm.fan"
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Force update bypass",
+      "description": "Skips mandatory version update check by always returning Success.",
+      "default": false,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.knowmerce.fromm.fan"
+        }
+      ],
+      "options": []
+    }
+  ]
+}
