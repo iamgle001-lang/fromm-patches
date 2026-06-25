@@ -6,6 +6,7 @@ import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patches.fromm.util.InstructionHelper
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.builder.BuilderInstruction
+import com.android.tools.smali.dexlib2.builder.instruction.BuilderInstruction21c
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 
 /*
@@ -74,7 +75,6 @@ val showDeletedMessagesPatch = bytecodePatch(
     compatibleWith("com.knowmerce.fromm.fan")
 
     execute {
-        // 모든 메서드를 먼저 조회
         val deleteMethod = deleteQueryFingerprint.match().method
         val selectMethod = selectQueryFingerprint.match().method
         val selectAscMethod = selectQueryAscFingerprint.match().method
@@ -89,27 +89,29 @@ val showDeletedMessagesPatch = bytecodePatch(
                 (instr as? ReferenceInstruction)?.reference?.toString()?.contains("UPDATE message SET deletedAt = ?, content") == true
         }
         if (updateQueryIdx == -1) throw PatchException("UPDATE query string not found")
+        val updateReg = (deleteInstructions[updateQueryIdx] as? BuilderInstruction21c)?.registerA ?: 0
         InstructionHelper.replaceInstruction(
             deleteMethod,
             updateQueryIdx,
-            """const-string v0, "UPDATE message SET deletedAt = ? WHERE hostChatRoomId = ? AND id = ?" """,
+            "const-string v$updateReg, \"UPDATE message SET deletedAt = ? WHERE hostChatRoomId = ? AND id = ?\"",
         )
 
         // 패치 B: SELECT 쿼리 조각 수정 — deletedAt 필터 제거
-        fun replaceDeletionFilter(method: app.morphe.patcher.util.proxy.mutableTypes.MutableMethod, replacement: String) {
+        fun replaceDeletionFilter(method: app.morphe.patcher.util.proxy.mutableTypes.MutableMethod, suffix: String) {
             val instrs = InstructionHelper.getInstructions(method)
             val idx = instrs.indexOfFirst { instr: BuilderInstruction ->
                 instr.opcode == Opcode.CONST_STRING &&
                     (instr as? ReferenceInstruction)?.reference?.toString()?.contains("deletedAt IS NULL OR deletedAt = 0") == true
             }
             if (idx == -1) throw PatchException("deletedAt filter not found in ${method.name}")
-            InstructionHelper.replaceInstruction(method, idx, replacement)
+            val reg = (instrs[idx] as? BuilderInstruction21c)?.registerA ?: 2
+            InstructionHelper.replaceInstruction(method, idx, "const-string v$reg, \" AND hidden = 0 AND createdAt $suffix\"")
         }
 
-        replaceDeletionFilter(selectMethod, """const-string v2, " AND hidden = 0 AND createdAt > " """)
-        replaceDeletionFilter(selectAscMethod, """const-string v2, " AND hidden = 0 AND createdAt >= " """)
-        replaceDeletionFilter(selectDescMethod, """const-string v2, " AND hidden = 0 AND createdAt < " """)
-        replaceDeletionFilter(selectDescEqMethod, """const-string v2, " AND hidden = 0 AND createdAt <= " """)
+        replaceDeletionFilter(selectMethod, "> ")
+        replaceDeletionFilter(selectAscMethod, ">= ")
+        replaceDeletionFilter(selectDescMethod, "< ")
+        replaceDeletionFilter(selectDescEqMethod, "<= ")
 
         // 패치 C: INSERT OR REPLACE → INSERT OR IGNORE
         val insertInstructions = InstructionHelper.getInstructions(insertMethod)
@@ -118,10 +120,11 @@ val showDeletedMessagesPatch = bytecodePatch(
                 (instr as? ReferenceInstruction)?.reference?.toString()?.contains("INSERT OR REPLACE INTO `message`") == true
         }
         if (insertQueryIdx == -1) throw PatchException("INSERT OR REPLACE query not found")
+        val insertReg = (insertInstructions[insertQueryIdx] as? BuilderInstruction21c)?.registerA ?: 0
         InstructionHelper.replaceInstruction(
             insertMethod,
             insertQueryIdx,
-            """const-string v0, "INSERT OR IGNORE INTO `message` (`id`,`hostChatRoomId`,`userId`,`userType`,`createdAt`,`type`,`content`,`thumbnail`,`deletedAt`,`starChatId`,`code`,`runningTime`,`translationCode`,`translatedMessage`,`hasNick`,`isBestFriend`,`hidden`,`supportMessageVersion`,`supportMessageVersionWhenSaved`,`mentionedMessageId`,`mentionedUserId`,`mentionedContent`,`mentionedTranslationCode`,`mentionedTranslatedMessage`,`mentionedDeletedAt`,`mentionedReportedAt`,`mentioned_emoticonItemId`,`mentioned_emoticonPackId`,`mentioned_emoticonIsAnimated`,`mentioned_emoticonImageUrl`,`mentioned_emoticonThumbnailUrl`,`emoticonItemId`,`emoticonPackId`,`emoticonIsAnimated`,`emoticonImageUrl`,`emoticonThumbnailUrl`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)" """,
+            "const-string v$insertReg, \"INSERT OR IGNORE INTO `message` (`id`,`hostChatRoomId`,`userId`,`userType`,`createdAt`,`type`,`content`,`thumbnail`,`deletedAt`,`starChatId`,`code`,`runningTime`,`translationCode`,`translatedMessage`,`hasNick`,`isBestFriend`,`hidden`,`supportMessageVersion`,`supportMessageVersionWhenSaved`,`mentionedMessageId`,`mentionedUserId`,`mentionedContent`,`mentionedTranslationCode`,`mentionedTranslatedMessage`,`mentionedDeletedAt`,`mentionedReportedAt`,`mentioned_emoticonItemId`,`mentioned_emoticonPackId`,`mentioned_emoticonIsAnimated`,`mentioned_emoticonImageUrl`,`mentioned_emoticonThumbnailUrl`,`emoticonItemId`,`emoticonPackId`,`emoticonIsAnimated`,`emoticonImageUrl`,`emoticonThumbnailUrl`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)\"",
         )
     }
 }

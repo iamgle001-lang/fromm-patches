@@ -6,38 +6,22 @@ import org.w3c.dom.Element
 @Suppress("unused")
 val sslPinningBypassPatch = resourcePatch(
     name = "SSL pinning bypass",
-    description = "Adds a network security config to bypass SSL certificate pinning.",
+    description = "Bypasses SSL certificate pinning via manifest flags and disables Sentry.",
 ) {
     compatibleWith("com.knowmerce.fromm.fan")
 
     execute {
-        // 1. res/xml/network_security_config.xml 생성
-        get("res/xml/network_security_config.xml").outputStream().use { out ->
-            out.write(
-                """<?xml version="1.0" encoding="utf-8"?>
-<network-security-config>
-    <base-config cleartextTrafficPermitted="true">
-        <trust-anchors>
-            <certificates src="system" />
-            <certificates overridePins="true" src="user" />
-        </trust-anchors>
-    </base-config>
-    <debug-overrides>
-        <trust-anchors>
-            <certificates src="system" />
-            <certificates overridePins="true" src="user" />
-        </trust-anchors>
-    </debug-overrides>
-</network-security-config>""".toByteArray()
-            )
-        }
-
-        // 2. AndroidManifest.xml — <application> 태그에 networkSecurityConfig 추가
         document("AndroidManifest.xml").use { doc ->
             val app = doc.getElementsByTagName("application").item(0) as Element
-            app.setAttribute("android:networkSecurityConfig", "@xml/network_security_config")
 
-            // Sentry 비활성화 (크래시 리포트 차단)
+            // debuggable=true makes Android trust user-added CAs automatically.
+            app.setAttribute("android:debuggable", "true")
+
+            // Remove the existing networkSecurityConfig so the app falls back to
+            // the system default (trust all system CAs, no custom pinning).
+            app.removeAttribute("android:networkSecurityConfig")
+
+            // Disable Sentry crash reporting via meta-data.
             listOf(
                 "io.sentry.enabled" to "false",
                 "io.sentry.dsn" to "",
