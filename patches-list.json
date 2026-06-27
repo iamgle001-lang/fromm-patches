@@ -2,8 +2,8 @@
   "version": "1.1.9",
   "patches": [
     {
-      "name": "Show deleted messages",
-      "description": "Preserves content of deleted messages and shows them in the chat list.",
+      "name": "삭제된 메시지 표시",
+      "description": "삭제된 메시지의 내용을 보존하여 채팅 목록에 표시합니다.",
       "default": false,
       "dependencies": [],
       "compatiblePackages": [
@@ -14,8 +14,8 @@
       "options": []
     },
     {
-      "name": "SSL pinning bypass",
-      "description": "Bypasses SSL certificate pinning via manifest flags and disables Sentry.",
+      "name": "SSL 핀닝 우회",
+      "description": "SSL 인증서 핀닝을 우회하고 Sentry를 비활성화합니다.",
       "default": false,
       "dependencies": [],
       "compatiblePackages": [
@@ -26,8 +26,8 @@
       "options": []
     },
     {
-      "name": "Show actual message count",
-      "description": "Shows the real unread/message count instead of capping the display at 99+.",
+      "name": "실제 메시지 수 표시",
+      "description": "99+로 표시되는 읽지 않은 메시지 수를 실제 숫자로 표시합니다.",
       "default": false,
       "dependencies": [],
       "compatiblePackages": [
@@ -38,8 +38,8 @@
       "options": []
     },
     {
-      "name": "Show hidden messages",
-      "description": "Shows messages hidden by the server in the chat room.",
+      "name": "숨겨진 메시지 표시",
+      "description": "서버에 의해 숨겨진 메시지를 채팅방에 표시합니다.",
       "default": false,
       "dependencies": [],
       "compatiblePackages": [

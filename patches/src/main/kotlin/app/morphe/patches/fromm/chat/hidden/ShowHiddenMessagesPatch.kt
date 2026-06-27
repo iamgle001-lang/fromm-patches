@@ -138,8 +138,8 @@ private fun removeHiddenFilter(method: app.morphe.patcher.util.proxy.mutableType
 
 @Suppress("unused")
 val showHiddenMessagesPatch = bytecodePatch(
-    name = "Show hidden messages",
-    description = "Shows messages hidden by the server in the chat room.",
+    name = "숨겨진 메시지 표시",
+    description = "서버에 의해 숨겨진 메시지를 채팅방에 표시합니다.",
 ) {
     compatibleWith("com.knowmerce.fromm.fan")
 

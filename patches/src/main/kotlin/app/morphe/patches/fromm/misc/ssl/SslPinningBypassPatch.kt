@@ -5,8 +5,8 @@ import org.w3c.dom.Element
 
 @Suppress("unused")
 val sslPinningBypassPatch = resourcePatch(
-    name = "SSL pinning bypass",
-    description = "Bypasses SSL certificate pinning via manifest flags and disables Sentry.",
+    name = "SSL 핀닝 우회",
+    description = "SSL 인증서 핀닝을 우회하고 Sentry를 비활성화합니다.",
 ) {
     compatibleWith("com.knowmerce.fromm.fan")
 

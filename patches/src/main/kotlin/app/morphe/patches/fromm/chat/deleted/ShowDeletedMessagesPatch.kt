@@ -111,8 +111,8 @@ private val deletedAtGetterFingerprint = fingerprint {
 
 @Suppress("unused")
 val showDeletedMessagesPatch = bytecodePatch(
-    name = "Show deleted messages",
-    description = "Preserves content of deleted messages and shows them in the chat list.",
+    name = "삭제된 메시지 표시",
+    description = "삭제된 메시지의 내용을 보존하여 채팅 목록에 표시합니다.",
 ) {
     compatibleWith("com.knowmerce.fromm.fan")
 

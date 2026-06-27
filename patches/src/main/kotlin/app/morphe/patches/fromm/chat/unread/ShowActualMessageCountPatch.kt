@@ -72,8 +72,8 @@ private fun patchCap(method: app.morphe.patcher.util.proxy.mutableTypes.MutableM
 
 @Suppress("unused")
 val showActualMessageCountPatch = bytecodePatch(
-    name = "Show actual message count",
-    description = "Shows the real unread/message count instead of capping the display at 99+.",
+    name = "실제 메시지 수 표시",
+    description = "99+로 표시되는 읽지 않은 메시지 수를 실제 숫자로 표시합니다.",
 ) {
     compatibleWith("com.knowmerce.fromm.fan")
 
