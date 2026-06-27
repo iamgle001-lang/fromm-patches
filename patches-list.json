@@ -1,16 +1,20 @@
 {
-  "version": "1.2.0",
+  "version": "1.2.1",
   "patches": [
     {
       "name": "삭제된 메시지 표시",
       "description": "삭제된 메시지의 내용을 보존하여 채팅 목록에 표시합니다.",
       "default": false,
       "dependencies": [],
-      "compatiblePackages": [
-        {
-          "packageName": "com.knowmerce.fromm.fan"
-        }
-      ],
+      "compatiblePackages": [{"packageName": "com.knowmerce.fromm.fan"}],
+      "options": []
+    },
+    {
+      "name": "삭제 메시지 내용 보존",
+      "description": "메시지가 삭제될 때 내용을 지우지 않고 보존합니다. '삭제된 메시지 표시' 패치와 함께 사용하세요.",
+      "default": false,
+      "dependencies": [],
+      "compatiblePackages": [{"packageName": "com.knowmerce.fromm.fan"}],
       "options": []
     },
     {
@@ -18,11 +22,7 @@
       "description": "SSL 인증서 핀닝을 우회하고 Sentry를 비활성화합니다.",
       "default": false,
       "dependencies": [],
-      "compatiblePackages": [
-        {
-          "packageName": "com.knowmerce.fromm.fan"
-        }
-      ],
+      "compatiblePackages": [{"packageName": "com.knowmerce.fromm.fan"}],
       "options": []
     },
     {
@@ -30,11 +30,7 @@
       "description": "99+로 표시되는 읽지 않은 메시지 수를 실제 숫자로 표시합니다.",
       "default": false,
       "dependencies": [],
-      "compatiblePackages": [
-        {
-          "packageName": "com.knowmerce.fromm.fan"
-        }
-      ],
+      "compatiblePackages": [{"packageName": "com.knowmerce.fromm.fan"}],
       "options": []
     },
     {
@@ -42,11 +38,7 @@
       "description": "서버에 의해 숨겨진 메시지를 채팅방에 표시합니다.",
       "default": false,
       "dependencies": [],
-      "compatiblePackages": [
-        {
-          "packageName": "com.knowmerce.fromm.fan"
-        }
-      ],
+      "compatiblePackages": [{"packageName": "com.knowmerce.fromm.fan"}],
       "options": []
     },
     {
@@ -54,11 +46,7 @@
       "description": "설정 > 버전 정보 화면에 적용된 모르페 패치 버전을 표시합니다.",
       "default": false,
       "dependencies": [],
-      "compatiblePackages": [
-        {
-          "packageName": "com.knowmerce.fromm.fan"
-        }
-      ],
+      "compatiblePackages": [{"packageName": "com.knowmerce.fromm.fan"}],
       "options": []
     }
   ]
