@@ -1,5 +1,5 @@
 {
-  "version": "1.1.8",
+  "version": "1.1.9",
   "patches": [
     {
       "name": "Show deleted messages",
@@ -28,6 +28,18 @@
     {
       "name": "Show actual message count",
       "description": "Shows the real unread/message count instead of capping the display at 99+.",
+      "default": false,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.knowmerce.fromm.fan"
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Show hidden messages",
+      "description": "Shows messages hidden by the server in the chat room.",
       "default": false,
       "dependencies": [],
       "compatiblePackages": [
