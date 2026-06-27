@@ -11,6 +11,15 @@ tasks.withType<JavaCompile>().configureEach {
     options.release.set(11)
 }
 
+tasks.named("buildAndroid") {
+    doLast {
+        val mpp = layout.buildDirectory.file("libs/patches-${project.version}.mpp").get().asFile
+        val dest = file("C:/Users/Administrator/Downloads/live/patches-latest.mpp")
+        mpp.copyTo(dest, overwrite = true)
+        println("Copied ${mpp.name} → ${dest.absolutePath}")
+    }
+}
+
 patches {
     about {
         name = "fromm Patches"
