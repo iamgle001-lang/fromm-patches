@@ -301,7 +301,8 @@ val showDeletedMessagesPatch = bytecodePatch(
         //   v0  = f9/c (parameter)
         //   v8  = f9/c.c (createdAt Date)
         //   v9  = f9/c.b (hostChatRoomId String)
-        //   v10 = f9/c.g (content String, "[삭제됨]..." after Patch A/E)
+        //   v10 = f9/c.g (translationCode String — NOT content)
+        //   content = f9/c.e (loaded via iget-object in the inserted block)
         //   v11 = f9/c.a (messageId String)
         // Method has .locals 33, so v13-v32 are free to use.
         try {
@@ -320,9 +321,17 @@ val showDeletedMessagesPatch = bytecodePatch(
                 //   v0  = f9/c (p0 was moved to v0 at method start)
                 //   v8  = f9/c.c (createdAt Date)
                 //   v9  = f9/c.b (hostChatRoomId String)
-                //   v10 = f9/c.g (content String, "[삭제됨]..." after Patches A/E)
+                //   v10 = f9/c.g (translationCode String — NOT content)
                 //   v11 = f9/c.a (messageId String)
+                //   v12 = null (0x0, unused from here)
                 //   .locals 33 → v0-v32 available
+                //
+                // NOTE on register encoding limits:
+                //   iget-object uses format 22c with 4-bit registers (0-15 only).
+                //   So we CANNOT do `iget-object v16, v0, ...` (v16 > 15 → VerifyError).
+                //   Workaround: load into v12 (≤ 15), then move-object/from16 to v16.
+                //   v12 is safe to clobber here (it was null, and dead K8/b code that
+                //   uses new-instance v12 is unreachable after our return-object).
                 //
                 // K8/e<init>(String msgId, String userId, String content,
                 //             Map translated, Z isDeleted, Z isReported, K8/D emoticonItem)
@@ -334,15 +343,16 @@ val showDeletedMessagesPatch = bytecodePatch(
                 //   → range {v21..v31}  (11 registers = this + 10 params)
                 //
                 // Simplifications to stay label-free:
-                //   - userId = messageId (v11), always non-null → no null check needed
-                //   - K8/e content = "[삭제됨]" (hardcoded) → always non-null
-                //   - hasReply = Boolean.TRUE → triggers reply-box rendering in y::w()
-                //   - K8/f.g content = "" → main text empty, avoids showing "[삭제됨]" twice
+                //   - userId = messageId (v11), always non-null
+                //   - content = f9/c.e (actual preserved content from Patches A/E)
+                //   - hasReply = Boolean.TRUE → triggers reply-box rendering
+                //   - K8/f.g content = "" → main text empty, content shown in reply box only
                 val smali = """
                     new-instance v13, LK8/e;
                     move-object v14, v11
                     move-object v15, v11
-                    const-string v16, "[삭제됨]"
+                    iget-object v12, v0, Lf9/c;->e:Ljava/lang/String;
+                    move-object/from16 v16, v12
                     const/16 v17, 0x0
                     const/16 v18, 0x0
                     const/16 v19, 0x0
