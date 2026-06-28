@@ -364,7 +364,7 @@ val showDeletedMessagesPatch = bytecodePatch(
                     move-object/from16 v24, v8
                     sget-object v25, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
                     const-string v26, ""
-                    const-string v27, ""
+                    move-object/from16 v27, v12
                     const/16 v28, 0x0
                     const/16 v29, 0x0
                     move-object/from16 v30, v13

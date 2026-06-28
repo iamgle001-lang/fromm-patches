@@ -1,6 +1,16 @@
 {
+<<<<<<< HEAD
   "version": "1.2.22",
   "created_at": "2026-06-28T14:53:45Z",
+=======
+<<<<<<< HEAD
+  "version": "1.2.21",
+  "created_at": "2026-06-28T11:58:14Z",
+=======
+  "version": "1.2.23",
+  "created_at": "2026-06-28T13:00:00Z",
+>>>>>>> ca709eb (fix: correct iget-object register encoding for v16 (VerifyError crash))
+>>>>>>> affeeb5 (fix: set K8/f.g=content to resolve star display for deleted messages)
   "description": "Patches for fromm fan app (com.knowmerce.fromm.fan)",
   "download_url": "https://raw.githubusercontent.com/iamgle001-lang/fro/main/patches-latest.mpp"
 }
